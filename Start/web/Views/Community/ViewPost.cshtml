@@ -1,0 +1,87 @@
+﻿@model PostDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Blogs</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Community" asp-action="ViewBlog" asp-route-id="@Model.BlogId">@Model.BlogTitle</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <article class="mb-5">
+        <h1 class="display-4">@Model.Title</h1>
+        <div class="text-muted mb-4">
+            <small>Posted on @Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</small>
+            @if (Model.LastModifiedAt != Model.CreatedAt)
+            {
+                    <small class="ms-3">Last modified @Model.LastModifiedAt.ToLocalTime().ToString("MMM dd, yyyy")</small>
+            }
+        </div>
+
+        <div class="card mb-5">
+            <div class="card-body">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    </article>
+
+    <section id="comments">
+        <h3 class="h4 mb-4">Comments</h3>
+
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form asp-action="AddComment" method="post">
+                            <input type="hidden" name="PostId" value="@Model.PostId" />
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Add a comment</label>
+                                <textarea name="Content" id="content" class="form-control" rows="3" required maxlength="1000"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Comment</button>
+                        </form>
+                    </div>
+                </div>
+        }
+        else
+        {
+                <div class="alert alert-info mb-4">
+                Please <a asp-controller="Account" asp-action="Login" class="alert-link">log in</a> or
+                <a asp-controller="Account" asp-action="Register" class="alert-link">register</a> to leave a comment.
+                </div>
+        }
+
+        @if (Model.Comments.Any())
+        {
+            foreach (var comment in Model.Comments)
+            {
+                        <div class="card mb-3 @(!comment.IsVisible ? "bg-light" : "")">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted">@comment.UserEmail on @comment.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</small>
+                            @if ((User.HasClaim("moderator", "true") || User.HasClaim("admin", "true")))
+                            {
+                                            <form asp-action="ToggleCommentVisibility" method="post" class="d-inline">
+                                                <input type="hidden" name="commentId" value="@comment.CommentId" />
+                                                <input type="hidden" name="postId" value="@Model.PostId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                        @(comment.IsVisible ? "Hide" : "Show") Comment
+                                                </button>
+                                            </form>
+                            }
+                                </div>
+                                <p class="card-text @(!comment.IsVisible ? "text-muted" : "")">@comment.Content</p>
+                            </div>
+                        </div>
+            }
+        }
+        else
+        {
+                <p class="text-muted">No comments yet. Be the first to comment!</p>
+        }
+    </section>
+</div>

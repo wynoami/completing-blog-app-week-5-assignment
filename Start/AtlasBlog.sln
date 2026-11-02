@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasBlog", "web\AtlasBlog.csproj", "{21CB7113-A9E0-430B-A726-050576B033EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogConsole", "console\BlogConsole.csproj", "{7F96DAC7-4F97-4270-9EAA-9763C676ABAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21CB7113-A9E0-430B-A726-050576B033EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21CB7113-A9E0-430B-A726-050576B033EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21CB7113-A9E0-430B-A726-050576B033EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21CB7113-A9E0-430B-A726-050576B033EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F96DAC7-4F97-4270-9EAA-9763C676ABAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F96DAC7-4F97-4270-9EAA-9763C676ABAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F96DAC7-4F97-4270-9EAA-9763C676ABAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F96DAC7-4F97-4270-9EAA-9763C676ABAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

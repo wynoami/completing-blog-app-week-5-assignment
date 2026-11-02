@@ -1,0 +1,39 @@
+﻿@model BlogEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Blog";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Edit Blog</h1>
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Subtitle" class="form-label"></label>
+                    <input asp-for="Subtitle" class="form-control" />
+                    <span asp-validation-for="Subtitle" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="MyBlog" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

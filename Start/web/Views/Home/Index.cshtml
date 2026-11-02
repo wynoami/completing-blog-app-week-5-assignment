@@ -1,0 +1,33 @@
+﻿@model IEnumerable<BlogListViewModel>
+@{
+    ViewData["Title"] = "Welcome to Atlas Blogs";
+}
+
+<div class="container mt-4">
+    <h1 class="display-4 mb-4">Featured Blogs</h1>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var blog in Model)
+        {
+            <div class="col">
+                <div class="card h-100 bg-light">
+                    <div class="card-body">
+                        <h2 class="card-title h4">
+                            <a asp-controller="Community" asp-action="ViewBlog" asp-route-id="@blog.BlogId"
+                               class="text-primary text-decoration-none">
+                                @blog.Title
+                            </a>
+                        </h2>
+                        @if (!string.IsNullOrEmpty(blog.Subtitle))
+                        {
+                            <p class="card-subtitle mb-3 text-muted">@blog.Subtitle</p>
+                        }
+                        <p class="card-text small text-muted">
+                            By: <span class="fw-medium">@blog.AuthorEmail</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,35 @@
+﻿@model BlogPostsViewModel
+@{
+    ViewData["Title"] = $"All Posts - {Model.BlogTitle}";
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Blogs</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Community" asp-action="ViewBlog" asp-route-id="@Model.BlogId">@Model.BlogTitle</a></li>
+            <li class="breadcrumb-item active" aria-current="page">All Posts</li>
+        </ol>
+    </nav>
+
+    <h1 class="display-4">@Model.BlogTitle</h1>
+    @if (!string.IsNullOrEmpty(Model.BlogSubtitle))
+    {
+            <p class="lead text-muted mb-4">@Model.BlogSubtitle</p>
+    }
+
+    <div class="card">
+        <div class="list-group list-group-flush">
+            @foreach (var post in Model.Posts)
+            {
+                    <a asp-controller="Community" asp-action="ViewPost" asp-route-id="@post.PostId" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h5 class="mb-1">@post.Title</h5>
+                            <small class="text-muted">@post.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</small>
+                        </div>
+                    </a>
+            }
+        </div>
+    </div>
+</div>

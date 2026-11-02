@@ -1,0 +1,55 @@
+﻿@model AtlasBlog.Models.EF.Blog
+
+@{
+    ViewData["Title"] = "My Blog";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>@Model.Title</h1>
+            @if (!string.IsNullOrEmpty(Model.Subtitle))
+            {
+                    <h4 class="text-muted">@Model.Subtitle</h4>
+            }
+            <div class="mt-3">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                        <p>@Model.Description</p>
+                }
+            </div>
+            <div class="mt-3">
+                <a asp-action="Edit" class="btn btn-primary">Edit Blog</a>
+                <a asp-controller="Post" asp-action="Create" class="btn btn-success">New Post</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h2>Recent Posts</h2>
+            @if (!Model.Posts.Any())
+            {
+                <p>No posts yet. Create your first post to get started!</p>
+            }
+            else
+            {
+                <div class="list-group">
+                @foreach (var post in Model.Posts.OrderByDescending(p => p.CreatedAt).Take(5))
+                {
+                            <div class="list-group-item bg-light">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">@post.Title</h5>
+                                    <small>@post.CreatedAt.ToShortDateString()</small>
+                                </div>
+                                <a asp-controller="Post" asp-action="Edit" asp-route-id="@post.PostId" class="btn btn-sm btn-outline-primary mt-2">Edit</a>
+                            </div>
+                }
+                </div>
+                <div class="mt-3">
+                    <a asp-controller="Post" asp-action="Index" class="btn btn-outline-secondary">View All Posts</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -26,6 +26,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+// Tell Identity where to send people who aren't logged in,
+// or who are logged in but lack the right claim.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AuthorRequired", policy => policy.RequireClaim("author", "true"));
@@ -43,9 +51,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.MapDefaultControllerRoute();
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication();   // Who are you? Reads the login cookie and fills in User
+app.UseAuthorization();    // Are you allowed? Checks [Authorize] attributes and policies
+
+app.MapDefaultControllerRoute();
 
 app.Run();

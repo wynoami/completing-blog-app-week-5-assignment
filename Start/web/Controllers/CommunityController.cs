@@ -1,74 +1,124 @@
 ﻿using AtlasBlog.Models.Views;
+using AtlasBlog.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AtlasBlog.Controllers;
 
+/// <summary>
+/// The public reading side of the site: blog pages, post pages,
+/// and comments. Anyone can read; commenting and moderating need a login.
+/// </summary>
+
 public class CommunityController : Controller
 {
+    private readonly ICommunityService _communityService;
+
+    public CommunityController (ICommunityService communityService)
+    {
+        _communityService = communityService;
+    }
+
+    // Shows a blog's details and its 5 most recent posts.
     // GET: Community/ViewBlog/5
+    [HttpGet]
     public async Task<IActionResult> ViewBlog(int? id)
     {
-        // TODO: Check if the provided blog ID is null, return NotFound if true
-        // TODO: Fetch the blog from the database, including its author and latest 5 posts
-        // TODO: If no blog is found, return NotFound
-        // TODO: Map the blog data to a view model
-        // TODO: Return the blog view model to the view
+        var blog = await _communityService.GetBlogDetailAsync(id.Value);
+        if (id is null)
+        {
+            return NotFound();
+        }
 
-        return View(); // Placeholder response
+        return View(blog); 
     }
 
+    // Shows a full post with its comments. Moderators and admins also
+    // see hidden comments so they can un-hide them.
     // GET: Community/ViewPost/5
+    [HttpGet]
     public async Task<IActionResult> ViewPost(int? id)
     {
-        // TODO: Check if the provided post ID is null, return NotFound if true
-        // TODO: Fetch the post, including its blog and related comments (only visible ones unless user is moderator/admin)
-        // TODO: If no post is found, return NotFound
-        // TODO: Map the post data to a view model
-        // TODO: Return the post view model to the view
+        if (id is null)
+        {
+            return NotFound();
+        }
 
-        return View(); // Placeholder response
+        var canModerate = User.HasClaim("moderator", "true") || User.HasClaim("admin", "true");
+
+        var post = await _communityService.GetPostDetailAsync(id.Value, includeHiddenComments: canModerate);
+        if (post is null)
+        {
+            return NotFound();
+        }
+
+        return View(post); 
     }
 
+    // Adds a comment from the logged-in user, then returns to the post.
     // POST: Community/AddComment
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize]
     public async Task<IActionResult> AddComment(CreateCommentViewModel model)
     {
-        // TODO: Validate the model state
-        // TODO: Create a new comment entity using the provided model data
-        // TODO: Set the current timestamp and associate the comment with the logged-in user
-        // TODO: Save the comment to the database
-        // TODO: Redirect back to the ViewPost page
+        if (!ModelState.IsValid)
+        {
+            TempData["Message"] = "Comments must be between 1 and 1000 characters.";
+            return RedirectToAction(nameof(ViewPost), new { id = model.PostId});
+        }
 
-        return RedirectToAction(nameof(ViewPost), new { id = model.PostId }); // Placeholder response
+        // The logged-in user's ID is stored in their login cookie as a claim
+        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userID is null)
+        {
+            return Challenge();
+        }
+
+        var added = await _communityService.AddCommentAsync(model.PostId, userID, model.Content);
+        if (!added)
+        {
+            return NotFound();
+        }
+
+        TempData["Message"] = "Your comment was added.";
+        return RedirectToAction(nameof(ViewPost), new { id = model.PostId }); 
     }
 
+    // Hides a visible comment or shows a hidden one. Moderators and admins only.
     // POST: Community/ToggleCommentVisibility
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Policy = "ModeratorOrAdmin")]
     public async Task<IActionResult> ToggleCommentVisibility(int commentId, int postId)
     {
-        // TODO: Fetch the comment by ID from the database
-        // TODO: If the comment is not found, return NotFound
-        // TODO: Toggle the visibility of the comment
-        // TODO: Save the changes to the database
-        // TODO: Redirect back to the ViewPost page
+        var toggled = await _communityService.ToggleCommentVisibilityAsync(commentId);
+        if (!toggled)
+        {
+            return NotFound();
+        }
 
-        return RedirectToAction(nameof(ViewPost), new { id = postId }); // Placeholder response
+        TempData["Message"] = "Comment visibility updated.";
+        return RedirectToAction(nameof(ViewPost), new { id = postId }); 
     }
 
+    // Shows every post in a blog, newest first.
     // GET: Community/ViewAllPosts/5
+    [HttpGet]
     public async Task<IActionResult> ViewAllPosts(int? blogId)
     {
-        // TODO: Check if the provided blog ID is null, return NotFound if true
-        // TODO: Fetch the blog and its posts, ordered by CreatedAt descending
-        // TODO: If no blog is found, return NotFound
-        // TODO: Map the blog and its posts to a view model
-        // TODO: Return the blog posts view model to the view
+        if (blogId is null)
+        {
+            return NotFound();
+        }
+        
+        var blogPosts = await _communityService.GetBlogPostsAsync(blogId.Value);
+        if (blogPosts is null)
+        {
+            return NotFound();
+        }
 
-        return View(); // Placeholder response
+        return View(blogPosts); 
     }
 }

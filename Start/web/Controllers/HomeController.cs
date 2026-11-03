@@ -1,31 +1,46 @@
 ﻿using AtlasBlog.Models.Views;
+using AtlasBlog.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AtlasBlog.Controllers;
 
+/// <summary>
+/// Shows the home page: a list of every blog on the site.
+/// </summary>
 public class HomeController : Controller
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(30);
 
+    private readonly ICommunityService _communityService;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(
+        ICommunityService communityService,
+        IMemoryCache cache,
+        ILogger<HomeController> logger)
+    {
+        _communityService = communityService;
+        _cache = cache;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// List all blogs. The list is cached for 30 minutes so the 
+    /// database isn't queried on every visit.
+    /// </summary>
     public async Task<IActionResult> Index()
     {
-        // TODO: Try retrieving the blog list from the cache
-        // TODO: If cache is empty, fetch blogs from the database (including author information)
-        // TODO: Map the blog data to a view model
-        // TODO: Store the result in the cache with a 30-minute expiration
-        // TODO: Return the blog list view
-
-        // Placeholder data used temporarily for application response; will be replaced with actual data.
-        return View(new List<BlogListViewModel>
+       // Try the cache first; only go to the database if it's empty or expired
+       if (!_cache.TryGetValue(CacheKeys.BlogList, out List<BlogListViewModel>? blogs) || blogs is null)
         {
-            new BlogListViewModel
-            {
-                 AuthorEmail= "author @example.com",
-                BlogId=1,
-                Title= "World of Code",
-                Subtitle = "My bits and bytes"
-            }
+            blogs = await _communityService.GetAllBlogsAsync();
+            _cache.Set(CacheKeys.BlogList, blogs, CacheDuration);
+            _logger.LogInformation("Blog list loaded from the databse ({Count} blogs) and cached for 30 minutes.", blogs.Count);
+        }
 
-        });
+        return View(blogs);
     }
 }
 

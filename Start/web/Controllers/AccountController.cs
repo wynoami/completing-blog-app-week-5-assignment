@@ -1,8 +1,10 @@
 ﻿using AtlasBlog.Data;
+using AtlasBlog.Services;
 using AtlasBlog.Models.EF;
 using AtlasBlog.Models.Views;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace AtlasBlog.Controllers
@@ -20,15 +22,18 @@ namespace AtlasBlog.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
+        private readonly IMemoryCache _cache;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IMemoryCache cache)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _cache = cache;
         }
 
         /// <summary>
@@ -156,6 +161,12 @@ namespace AtlasBlog.Controllers
             }
 
             await transaction.CommitAsync();
+
+            if (model.AccountType == "Author")
+            {
+                // A new blog exists, so the cached home page list is out of date
+                _cache.Remove(CacheKeys.BlogList);
+            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             TempData["Message"] = "Welcome! Your account has been created.";

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AtlasBlog.Services;
 using Microsoft.AspNetCore.Authorization;
+using AtlasBlog.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,11 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+// Our custom middleware goes first so it wraps everything after it:
+// the logger sees every request and its final status code, and the
+// exception handler catches errors thrown anywhere further down.
+app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

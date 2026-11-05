@@ -3,6 +3,7 @@ using AtlasBlog.Models.EF;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AtlasBlog.Services;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // our own services. "Scoped" = one instnace per web request,
 // matching the lifetime of ApplicationDbContext.
 builder.Services.AddScoped<ICommunityService, CommunityService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

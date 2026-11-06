@@ -4,7 +4,7 @@ using System.Net;
 namespace AtlasBlog.Middleware;
 
 /// <summary>
-/// Catches any undhandled exception thrown later in the pipeline, logs it,
+/// Catches any unhandled exception thrown later in the pipeline, logs it,
 /// and returns a clean error response instead of a crash or a stack trace.
 /// API requests (/api/...) get a JSON error; page requests get a friendly HTML page.
 /// </summary>
@@ -48,7 +48,7 @@ public class ExceptionHandlingMiddleware
                 await context.Response.WriteAsJsonAsync(new
                 {
                     status = StatusCodes.Status500InternalServerError,
-                    error = "An unexpected error ocurred. Please try again later.",
+                    error = "An unexpected error occurred. Please try again later.",
                     traceId
                 });
             }
@@ -74,7 +74,7 @@ public class ExceptionHandlingMiddleware
                 <title>Something went wrong - Atlas Blog</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
             </head>
-            <body<
+            <body>
                 <div class="container text-center mt-5">
                     <h1 class="display-5">Something went wrong</h1>
                     <p class="lead">Sorry, we hit an unexpected error. Please try again in a moment.</p>

@@ -1,10 +1,9 @@
 using AtlasBlog.Data;
+using AtlasBlog.Services;
 using AtlasBlog.Models.EF;
+using AtlasBlog.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using AtlasBlog.Services;
-using Microsoft.AspNetCore.Authorization;
-using AtlasBlog.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +16,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 
-// our own services. "Scoped" = one instnace per web request,
+// Our own services. "Scoped" = one instance per web request,
 // matching the lifetime of ApplicationDbContext.
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
@@ -54,6 +53,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
 // Our custom middleware goes first so it wraps everything after it:
 // the logger sees every request and its final status code, and the
 // exception handler catches errors thrown anywhere further down.

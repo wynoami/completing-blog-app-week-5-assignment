@@ -1,7 +1,7 @@
-﻿using AtlasBlog.Services;
+﻿using AtlasBlog.Models.Views;
+using AtlasBlog.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AtlasBlog.Models.Views;
 using System.Security.Claims;
 
 namespace AtlasBlog.Controllers;
@@ -9,21 +9,21 @@ namespace AtlasBlog.Controllers;
 /// <summary>
 /// Lets an author list, create, and edit posts in their own blog. Authors only.
 /// </summary>
-
 [Authorize(Policy = "AuthorRequired")]
 public class PostController : Controller
 {
     private readonly IAuthorService _authorService;
 
-    public PostController(IAuthorService authorservice)
+    public PostController(IAuthorService authorService)
     {
-        _authorService = authorservice;
+        _authorService = authorService;
     }
 
-    // The logged-in user's ID, read from their login cookie.
+    /// <summary>The logged-in user's ID, read from their login cookie.</summary>
     private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    // Lists every post in the author's blog, newest first.
+    /// <summary>Lists every post in the author's blog, newest first.</summary>
+    // GET: Post
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -42,16 +42,15 @@ public class PostController : Controller
         return View(posts);
     }
 
-    // Shows an empty form for a new post.
+    /// <summary>Shows an empty form for a new post.</summary>
     // GET: Post/Create
     [HttpGet]
     public IActionResult Create()
     {
-
         return View(new PostEditViewModel());
     }
 
-    // Saves a new post to the author's blog, then returns to the post list.
+    /// <summary>Saves a new post to the author's blog, then returns to the post list.</summary>
     // POST: Post/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -78,7 +77,7 @@ public class PostController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Shows the edit form for one of the author's own posts.
+    /// <summary>Shows the edit form for one of the author's own posts.</summary>
     // GET: Post/Edit/5
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
@@ -89,7 +88,7 @@ public class PostController : Controller
             return Challenge();
         }
 
-        // Returns null if the post doesn't exist OR belongs to another author.
+        // Returns null if the post doesn't exist OR belongs to another author
         var model = await _authorService.GetPostForEditAsync(userId, id);
         if (model is null)
         {
@@ -99,8 +98,8 @@ public class PostController : Controller
         return View(model);
     }
 
-    // Saves changes to one of the author's own posts, then returns to the post list.
-    // POST Post/Edit/5
+    /// <summary>Saves changes to one of the author's own posts, then returns to the post list.</summary>
+    // POST: Post/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, PostEditViewModel model)

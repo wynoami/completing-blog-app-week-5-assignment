@@ -1,6 +1,3 @@
-using System.Net.Mime;
-using System.Reflection;
-using System.Transactions;
 using AtlasBlog.Data;
 using AtlasBlog.Models.EF;
 using AtlasBlog.Models.Views;
@@ -8,10 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AtlasBlog.Services;
 
-// Entity Framework implementation of <see cref="ICommunityService"/>
+/// <summary>
+/// Entity Framework implementation of <see cref="ICommunityService"/>.
+/// </summary>
 public class CommunityService : ICommunityService
-{   
+{
     private const int RecentPostCount = 5;
+
     private readonly ApplicationDbContext _context;
 
     public CommunityService(ApplicationDbContext context)

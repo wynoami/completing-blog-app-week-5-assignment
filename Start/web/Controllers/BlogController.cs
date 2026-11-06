@@ -10,7 +10,6 @@ namespace AtlasBlog.Controllers;
 /// <summary>
 /// Lets an author view and edit their own blog. Authors only.
 /// </summary>
-
 [Authorize(Policy = "AuthorRequired")]
 public class BlogController : Controller
 {
@@ -23,10 +22,10 @@ public class BlogController : Controller
         _cache = cache;
     }
 
-    // The logged-in user's ID, read from their login cookie.
+    /// <summary>The logged-in user's ID, read from their login cookie.</summary>
     private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    // Shows the author's blog and its most recent posts.
+    /// <summary>Shows the author's blog and its most recent posts.</summary>
     // GET: Blog/MyBlog
     [HttpGet]
     public async Task<IActionResult> MyBlog()
@@ -46,7 +45,7 @@ public class BlogController : Controller
         return View(blog);
     }
 
-    // Shows the form for editing the blog's title, subtitle, and description.
+    /// <summary>Shows the form for editing the blog's title, subtitle, and description.</summary>
     // GET: Blog/Edit
     [HttpGet]
     public async Task<IActionResult> Edit()
@@ -66,7 +65,7 @@ public class BlogController : Controller
         return View(model);
     }
 
-    // Saves the blog's new details, then returns to My Blog.
+    /// <summary>Saves the blog's new details, then returns to My Blog.</summary>
     // POST: Blog/Edit
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -93,7 +92,6 @@ public class BlogController : Controller
         _cache.Remove(CacheKeys.BlogList);
 
         TempData["Message"] = "Your blog was updated.";
-
         return RedirectToAction(nameof(MyBlog));
     }
 }

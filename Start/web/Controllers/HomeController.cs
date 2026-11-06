@@ -27,22 +27,19 @@ public class HomeController : Controller
     }
 
     /// <summary>
-    /// List all blogs. The list is cached for 30 minutes so the 
+    /// Lists all blogs. The list is cached for 30 minutes so the
     /// database isn't queried on every visit.
     /// </summary>
     public async Task<IActionResult> Index()
     {
-       // Try the cache first; only go to the database if it's empty or expired
-       if (!_cache.TryGetValue(CacheKeys.BlogList, out List<BlogListViewModel>? blogs) || blogs is null)
+        // Try the cache first; only go to the database if it's empty or expired
+        if (!_cache.TryGetValue(CacheKeys.BlogList, out List<BlogListViewModel>? blogs) || blogs is null)
         {
             blogs = await _communityService.GetAllBlogsAsync();
             _cache.Set(CacheKeys.BlogList, blogs, CacheDuration);
-            _logger.LogInformation("Blog list loaded from the databse ({Count} blogs) and cached for 30 minutes.", blogs.Count);
+            _logger.LogInformation("Blog list loaded from the database ({Count} blogs) and cached for 30 minutes.", blogs.Count);
         }
 
         return View(blogs);
     }
 }
-
-
-

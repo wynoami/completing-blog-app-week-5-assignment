@@ -17,7 +17,7 @@ public class AuthorService : IAuthorService
         _context = context;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<Blog?> GetBlogWithPostsAsync(string authorId)
     {
         return await _context.Blogs
@@ -26,7 +26,7 @@ public class AuthorService : IAuthorService
             .FirstOrDefaultAsync(b => b.AuthorId == authorId);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<BlogEditViewModel?> GetBlogForEditAsync(string authorId)
     {
         return await _context.Blogs
@@ -41,7 +41,7 @@ public class AuthorService : IAuthorService
             .FirstOrDefaultAsync();
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> UpdateBlogAsync(string authorId, BlogEditViewModel model)
     {
         var blog = await _context.Blogs.FirstOrDefaultAsync(b => b.AuthorId == authorId);
@@ -59,7 +59,7 @@ public class AuthorService : IAuthorService
         return true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<List<Post>?> GetPostsAsync(string authorId)
     {
         var blogId = await _context.Blogs
@@ -79,7 +79,7 @@ public class AuthorService : IAuthorService
             .ToListAsync();
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> CreatePostAsync(string authorId, PostEditViewModel model)
     {
         var blogId = await _context.Blogs
@@ -109,7 +109,7 @@ public class AuthorService : IAuthorService
         return true;
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public async Task<PostEditViewModel?> GetPostForEditAsync(string authorId, int postId)
     {
         return await _context.Posts
@@ -124,7 +124,7 @@ public class AuthorService : IAuthorService
             .FirstOrDefaultAsync();
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public async Task<bool> UpdatePostAsync(string authorId, int postId, PostEditViewModel model)
     {
         var post = await _context.Posts

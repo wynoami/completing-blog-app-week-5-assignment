@@ -10,32 +10,38 @@ namespace AtlasBlog.Controllers;
 /// The public reading side of the site: blog pages, post pages,
 /// and comments. Anyone can read; commenting and moderating need a login.
 /// </summary>
-
 public class CommunityController : Controller
 {
     private readonly ICommunityService _communityService;
 
-    public CommunityController (ICommunityService communityService)
+    public CommunityController(ICommunityService communityService)
     {
         _communityService = communityService;
     }
 
-    // Shows a blog's details and its 5 most recent posts.
+    /// <summary>Shows a blog's details and its 5 most recent posts.</summary>
     // GET: Community/ViewBlog/5
     [HttpGet]
     public async Task<IActionResult> ViewBlog(int? id)
     {
-        var blog = await _communityService.GetBlogDetailAsync(id.Value);
         if (id is null)
         {
             return NotFound();
         }
 
-        return View(blog); 
+        var blog = await _communityService.GetBlogDetailAsync(id.Value);
+        if (blog is null)
+        {
+            return NotFound();
+        }
+
+        return View(blog);
     }
 
-    // Shows a full post with its comments. Moderators and admins also
-    // see hidden comments so they can un-hide them.
+    /// <summary>
+    /// Shows a full post with its comments. Moderators and admins also
+    /// see hidden comments so they can un-hide them.
+    /// </summary>
     // GET: Community/ViewPost/5
     [HttpGet]
     public async Task<IActionResult> ViewPost(int? id)
@@ -53,10 +59,10 @@ public class CommunityController : Controller
             return NotFound();
         }
 
-        return View(post); 
+        return View(post);
     }
 
-    // Adds a comment from the logged-in user, then returns to the post.
+    /// <summary>Adds a comment from the logged-in user, then returns to the post.</summary>
     // POST: Community/AddComment
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -66,27 +72,27 @@ public class CommunityController : Controller
         if (!ModelState.IsValid)
         {
             TempData["Message"] = "Comments must be between 1 and 1000 characters.";
-            return RedirectToAction(nameof(ViewPost), new { id = model.PostId});
+            return RedirectToAction(nameof(ViewPost), new { id = model.PostId });
         }
 
         // The logged-in user's ID is stored in their login cookie as a claim
-        var userID = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userID is null)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
         {
             return Challenge();
         }
 
-        var added = await _communityService.AddCommentAsync(model.PostId, userID, model.Content);
+        var added = await _communityService.AddCommentAsync(model.PostId, userId, model.Content);
         if (!added)
         {
             return NotFound();
         }
 
         TempData["Message"] = "Your comment was added.";
-        return RedirectToAction(nameof(ViewPost), new { id = model.PostId }); 
+        return RedirectToAction(nameof(ViewPost), new { id = model.PostId });
     }
 
-    // Hides a visible comment or shows a hidden one. Moderators and admins only.
+    /// <summary>Hides a visible comment or shows a hidden one. Moderators and admins only.</summary>
     // POST: Community/ToggleCommentVisibility
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -100,11 +106,11 @@ public class CommunityController : Controller
         }
 
         TempData["Message"] = "Comment visibility updated.";
-        return RedirectToAction(nameof(ViewPost), new { id = postId }); 
+        return RedirectToAction(nameof(ViewPost), new { id = postId });
     }
 
-    // Shows every post in a blog, newest first.
-    // GET: Community/ViewAllPosts/5
+    /// <summary>Shows every post in a blog, newest first.</summary>
+    // GET: Community/ViewAllPosts?blogId=5
     [HttpGet]
     public async Task<IActionResult> ViewAllPosts(int? blogId)
     {
@@ -112,13 +118,13 @@ public class CommunityController : Controller
         {
             return NotFound();
         }
-        
+
         var blogPosts = await _communityService.GetBlogPostsAsync(blogId.Value);
         if (blogPosts is null)
         {
             return NotFound();
         }
 
-        return View(blogPosts); 
+        return View(blogPosts);
     }
 }
